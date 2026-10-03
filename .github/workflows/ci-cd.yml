@@ -1,0 +1,51 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # same Python as app/Dockerfile
+      - name: Install dependencies
+        run: pip install -r app/requirements.txt pytest
+      - name: Run unit tests
+        run: pytest app/code -v
+
+  build-and-push:
+    needs: test                           # only runs if the tests pass
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./app                  # folder that holds the Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/car-price-app:a3
+
+  deploy:
+    needs: build-and-push                 # only runs if the image was pushed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull and restart on ml-brain
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ml.brain.cs.ait.ac.th
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          proxy_host: ${{ secrets.JUMP_HOST }}
+          proxy_username: ${{ secrets.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/st126979-app
+            docker compose pull
+            docker compose up -d
