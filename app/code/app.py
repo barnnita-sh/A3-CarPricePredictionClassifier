@@ -530,13 +530,8 @@ def a3_class_table():
 def a3_model_page():
     return predictor_page(
         "a3",
-        "The price class estimate",
-        "Instead of one exact price, this model tells you which of four price ranges the car belongs to. "
-        "Each range holds about a quarter of the cars in the dataset. A range is easier to trust than a "
-        "single figure, and it is what you usually need when deciding what to list a car for or what to offer. "
-        "The model is a multinomial logistic regression built from scratch, chosen after comparing training "
-        "methods, learning rates and a Ridge penalty in MLflow.",
-        "Logistic regression, A3 final model.",
+        "Classification Model",
+                "This model predicts which of four price ranges a car falls into, using a logistic regression built from scratch.",
         "/a3-model",
         result_label="Predicted price class",
         button_text="Predict price class",
