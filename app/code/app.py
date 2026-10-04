@@ -531,13 +531,13 @@ def a3_model_page():
     return predictor_page(
         "a3",
         "Classification Model",
-                "This model predicts which of four price ranges a car falls into, using a logistic regression built from scratch.",
+        "This model predicts which of four price ranges a car falls into, using a logistic regression built from scratch.",
+        "Logistic regression, A3 final model.",
         "/a3-model",
         result_label="Predicted price class",
         button_text="Predict price class",
         extra=a3_class_table(),
     )
-
 
 app.layout = html.Div([dcc.Location(id="url"), html.Div(id="page-content")])
 
